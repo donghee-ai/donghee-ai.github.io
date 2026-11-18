@@ -44,7 +44,8 @@ h3 { font-size: 19px; line-height: 1.4; margin: 0 0 6px; }
 
 p { margin: 0 0 12px; }
 
-.lead { font-size: 17px; margin: 12px 0 10px; }
+.role { font-size: 16px; color: var(--muted); margin: 0 0 14px; }
+.lead { font-size: 17px; margin: 0 0 10px; }
 .contact, .updated, .meta, .tags, .caption, .back { color: var(--muted); font-size: 14px; }
 .contact a { color: var(--muted); }
 .updated { color: var(--faint); margin-top: 4px; }
@@ -52,7 +53,7 @@ p { margin: 0 0 12px; }
 /* 대표 프로젝트 목록 */
 .project {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 320px 1fr;
   gap: 24px;
   padding: 28px 0;
   border-bottom: 1px solid var(--line);
@@ -60,12 +61,13 @@ p { margin: 0 0 12px; }
 .project:first-of-type { padding-top: 4px; }
 .project .media video, .project .media img {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
   display: block;
   background: #f2f2f2;
   border-radius: 4px;
 }
+.project .media .top { object-position: center top; }
 .project h3 a { text-decoration: none; }
 .project h3 a:hover { text-decoration: underline; }
 .project .key { font-size: 15px; margin: 8px 0; }
