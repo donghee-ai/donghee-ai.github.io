@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>김동희 · 로봇·엣지 AI 포트폴리오</title>
+<meta name="description" content="로봇과 엣지 디바이스에서 AI 모델을 실제로 돌리고, 측정하고, 고친 기록입니다.">
+<meta property="og:title" content="김동희 · 로봇·엣지 AI 포트폴리오">
+<meta property="og:description" content="로봇과 엣지 디바이스에서 AI 모델을 실제로 돌리고, 측정하고, 고친 기록입니다.">
+<meta property="og:image" content="https://donghee.org/assets/pai-poster.jpg">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+
+<header>
+  <h1>김동희</h1>
+  <p class="lead">로봇과 엣지 디바이스에서 AI 모델을 실제로 돌리고, 측정하고, 고치는 일을 해 왔습니다. 한성대학교 AI응용학과 3학년에 재학 중입니다.</p>
+  <p class="contact">
+    <a href="mailto:danny20049090@gmail.com">danny20049090@gmail.com</a> ·
+    <a href="https://github.com/donghee-ai">GitHub</a> ·
+    <a href="https://huggingface.co/danny1002">Hugging Face</a>
+  </p>
+  <p class="updated">마지막 업데이트 2026-11-18</p>
+</header>
+
+<h2>대표 프로젝트</h2>
+
+<article class="project">
+  <div class="media">
+    <video src="assets/hc-squat.mp4" poster="assets/hc-squat-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="스쿼트 횟수를 세는 화면 녹화"></video>
+  </div>
+  <div>
+    <h3><a href="projects/health-coach.html">Arduino UNO Q 헬스 코치 로봇</a></h3>
+    <p>NPU가 없는 Arduino UNO Q 한 대에서 운동 횟수 세기, PTZ 짐벌 추적, 모바일 웹앱을 컨테이너 하나와 프로세스 하나로 함께 돌렸습니다.</p>
+    <p class="key">포즈 추론 약 11.4 FPS, CPU 사용률 약 83% (실기 측정)</p>
+    <p class="tags">2026.06 ~ 09 · 개인 · Arduino UNO Q, MoveNet INT8, LiteRT, OpenCV, Docker</p>
+    <p class="more"><a href="projects/health-coach.html">자세히 보기</a> · <a href="https://github.com/donghee-ai/health_care_bot">코드</a></p>
+  </div>
+</article>
+
+<article class="project">
+  <div class="media">
+    <video src="assets/pai-thumb.mp4" poster="assets/pai-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="SO-101 양팔이 조각을 쓰레받기에 쓸어 담는 실기 영상"></video>
+  </div>
+  <div>
+    <h3><a href="projects/pai.html">PAI, 말로 지시하는 양팔 쓰레기 수거 로봇</a></h3>
+    <p>"청소해줘"라고 입력하면 SO-101 양팔이 ACT 정책으로 책상 위 조각을 쓰레받기에 쓸어 담는 팀 데모입니다. 저는 Language 파트, LeRobot 연동 어댑터, 세 프로세스의 통합을 맡았습니다.</p>
+    <p class="key">유닛 테스트 137개, 실기 없이 확인하는 dry-run 하니스</p>
+    <p class="tags">2026.04 ~ 08 · 산학협력, 현장실습 · Jetson AGX Thor, LeRobot, ACT, ZMQ</p>
+    <p class="more"><a href="projects/pai.html">자세히 보기</a> · <a href="https://github.com/donghee-ai/PAI">코드</a></p>
+  </div>
+</article>
+
+<article class="project">
+  <div class="media">
+    <video src="assets/jetson-agent-4x.mp4" poster="assets/jetson-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Jetson의 로컬 에이전트가 Slack에서 답하는 장면, 4배속"></video>
+  </div>
+  <div>
+    <h3><a href="projects/jetson.html">Jetson 온디바이스 LLM 개인 비서</a></h3>
+    <p>Jetson Orin NX 16GB에서 모델 13개 구성을 직접 측정하고, 그 결과로 고른 Qwen3-8B 위에 내 활동 기록을 근거로 답하는 비서를 만들어 Slack에 연결했습니다.</p>
+    <p class="key">도구 호출 시험 8B 6/6, 30B 4/6 · 운영 장애 기록 65건</p>
+    <p class="tags">2026.08 ~ 09 · 개인 · Jetson Orin NX, llama.cpp, Qwen3-8B, MCP, SQLite</p>
+    <p class="more"><a href="projects/jetson.html">자세히 보기</a> · <a href="https://github.com/donghee-ai/project-jetson">코드</a></p>
+  </div>
+</article>
+
+<h2>그 밖의 작업</h2>
+
+<ul class="list">
+  <li>
+    <span class="name"><a href="https://github.com/donghee-ai/unoq-edge-ai-lines">UNO Q Edge AI Lines</a></span>
+    <span class="sub">· 2026.06 · 개인</span><br>
+    <span class="desc">NPU 없는 UNO Q에서 CPU만으로 YOLOv8n 9.23 FPS, MoveNet 9.69 FPS, Whisper Tiny로 11초 음성 3.18초를 실측했습니다. 장시간 구동에서 열 기준(70 °C)을 넘은 것도 기록했습니다.</span>
+  </li>
+  <li>
+    <span class="name">Mendii 신발 손상 검출 AI</span>
+    <span class="sub">· 2026.09부터 · 산학협력 · 메인 모델 담당 · 코드와 데이터 비공개</span><br>
+    <span class="desc">DINOv3-L을 고정하고 패치 분류기를 학습해 뒤꿈치 안감 손상과 솔 나감을 판정합니다. 테스트 1,202장 사진 단위 F1 0.870. 솔 나감 재현율은 0.549로 아직 약합니다.</span>
+  </li>
+  <li>
+    <span class="name">데이콘 나라장터 법령 위반 모니터링 AI</span>
+    <span class="sub">· 2026.08 ~ 09 · 1인 참가 · Private 리더보드 3위 · 대회 데이터 때문에 코드 비공개</span><br>
+    <span class="desc">LLM은 공고에서 사실 28개만 뽑고, 판정은 조문 근거가 붙은 규칙 148개가 하도록 나눴습니다. LLM 직접 판정은 모든 항목에서 규칙보다 낮았습니다.</span>
+  </li>
+  <li>
+    <span class="name"><a href="https://github.com/Andyyyy64/whichllm/pull/218">whichllm 오픈소스 기여, PR #218</a></span>
+    <span class="sub">· 2026.10 · 머지됨</span><br>
+    <span class="desc">Jetson Orin을 GPU 없는 기기로 잘못 인식하던 문제를 장치 트리의 부품 번호로 고쳤습니다. 메모리 대역폭 추정 오차 1.0%, 테스트 527개 통과, v0.6.0 릴리스 노트 반영.</span>
+  </li>
+  <li>
+    <span class="name"><a href="https://github.com/donghee-ai/nrf24l01-link">nRF24L01+ 다중 노드 무선 링크</a></span>
+    <span class="sub">· 2026.07 · 현장실습 중 작업</span><br>
+    <span class="desc">RF24 라이브러리 없이 ATmega328P 레지스터를 직접 다뤄 1:N 반이중 링크를 만들고, 하드웨어 없이 PC에서 같은 펌웨어를 시험할 수 있게 했습니다.</span>
+  </li>
+  <li>
+    <span class="name"><a href="https://github.com/donghee-ai/job-radar">Job Radar</a></span>
+    <span class="sub">· 2026.04부터 · 개인</span><br>
+    <span class="desc">25개 회사 채용 공고를 매일 수집해 직무별로 분류합니다. 무작위 표본 79건에서 직무 분류 정확도 87.3%.</span>
+  </li>
+</ul>
+
+<h2>경력·활동</h2>
+
+<table>
+  <tbody>
+    <tr><td class="when">2023.03 ~</td><td class="kind">학력</td><td>한성대학교 AI응용학과 (3학년 재학 중)</td></tr>
+    <tr><td class="when">2023.12 ~ 2025.06</td><td class="kind">병역</td><td>통신병 복무</td></tr>
+    <tr><td class="when">2026.04 ~ 2026.08</td><td class="kind">산학협력</td><td>PAI 양팔 로봇 (한성대 SW중심대학사업단)</td></tr>
+    <tr><td class="when">2026.07 ~ 2026.08</td><td class="kind">현장실습</td><td>㈜온에이아이로봇, 대화형 Physical AI 로봇 제어 개발 (328시간)</td></tr>
+    <tr><td class="when">2026.08 ~ 2026.09</td><td class="kind">대회</td><td>데이콘 나라장터 법령 위반 모니터링 AI, 1인 참가 Private 리더보드 3위</td></tr>
+    <tr><td class="when">2026</td><td class="kind">대회</td><td>SW중심대학 디지털 경진대회 AI부문, 5인 팀 19위 / 261팀</td></tr>
+    <tr><td class="when">2026.09 ~</td><td class="kind">산학협력</td><td>Mendii 신발 손상 검출 AI (AI온캠퍼스인턴십)</td></tr>
+    <tr><td class="when">2026.10</td><td class="kind">오픈소스</td><td>whichllm PR #218 머지</td></tr>
+  </tbody>
+</table>
+
+<h2>AI를 쓰는 방식</h2>
+
+<p>코드 작성은 Claude Code 같은 AI 코딩 도구와 함께 합니다. 무엇을 잴지 정하고, 결과가 맞는지는 실기 측정과 테스트로 직접 확인합니다. 그래서 GitHub 커밋 다수에 Claude 공동작성 표기가 남아 있습니다.</p>
+
+<footer>© 2026 김동희 · <a href="https://github.com/donghee-ai">github.com/donghee-ai</a></footer>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arduino UNO Q 헬스 코치 로봇 · 김동희</title>
+<meta name="description" content="NPU 없는 Arduino UNO Q 한 대에서 운동 횟수 세기, PTZ 짐벌 추적, 웹앱을 함께 돌린 프로젝트">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+
+<a class="back" href="../index.html">김동희 포트폴리오</a>
+
+<h1>Arduino UNO Q 헬스 코치 로봇</h1>
+<p class="meta">2026.06 ~ 2026.09 · 개인 (멘토링 프로젝트) · <a href="https://github.com/donghee-ai/health_care_bot">GitHub</a></p>
+
+<p>카메라로 자세를 보고 운동 횟수를 세고, PTZ 짐벌로 사람을 따라가며, 휴대폰 웹앱으로 결과를 보여 주는 로봇입니다. NPU가 없는 Arduino UNO Q(Qualcomm QRB2210, Cortex-A53 4코어) 한 대에서 이 세 가지를 컨테이너 하나, 프로세스 하나로 돌렸습니다.</p>
+
+<div class="row">
+  <figure>
+    <img src="../assets/hc-robot.jpg" alt="짐벌 하우징. 머리에 카메라와 피치 모터, 받침에 요 모터와 UNO Q">
+    <figcaption>3D 프린트 짐벌 하우징</figcaption>
+  </figure>
+  <figure>
+    <video src="../assets/hc-squat.mp4" autoplay muted loop playsinline preload="metadata" aria-label="스쿼트 횟수 세기"></video>
+    <figcaption>스쿼트, 무릎 각도 100°와 140° 사이</figcaption>
+  </figure>
+  <figure>
+    <video src="../assets/hc-ptz.mp4" autoplay muted loop playsinline preload="metadata" aria-label="PTZ 자동 추적"></video>
+    <figcaption>PTZ 추적, 화면 밖으로 나갔다 들어와도 다시 찾음</figcaption>
+  </figure>
+</div>
+<p class="caption">모두 웹앱 화면을 녹화한 것이고 배속하지 않았습니다.</p>
+
+<h2>구조</h2>
+
+<figure>
+<svg viewBox="0 0 720 330" role="img" aria-label="헬스 코치 로봇 소프트웨어 구조">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#161616"/>
+    </marker>
+  </defs>
+  <g font-size="13" fill="#161616">
+    <rect x="10" y="26" width="700" height="296" fill="none" stroke="#9a9a9a" stroke-dasharray="5 4" rx="6"/>
+    <text x="22" y="18" fill="#5f5f5f">Arduino UNO Q · 컨테이너 1개 · 프로세스 1개</text>
+
+    <g stroke="#161616" fill="#fff">
+      <rect x="30" y="50" width="140" height="56" rx="4"/>
+      <rect x="200" y="50" width="150" height="56" rx="4"/>
+      <rect x="380" y="50" width="170" height="56" rx="4"/>
+      <rect x="580" y="50" width="110" height="56" rx="4"/>
+      <rect x="30" y="200" width="200" height="70" rx="4"/>
+      <rect x="260" y="200" width="210" height="70" rx="4"/>
+      <rect x="500" y="200" width="190" height="70" rx="4"/>
+    </g>
+
+    <text x="100" y="83" text-anchor="middle">USB 카메라</text>
+    <text x="275" y="76" text-anchor="middle">프레임 수집 스레드</text>
+    <text x="275" y="95" text-anchor="middle" fill="#5f5f5f" font-size="12">최신 프레임만 유지</text>
+    <text x="465" y="76" text-anchor="middle">MoveNet Thunder INT8</text>
+    <text x="465" y="95" text-anchor="middle" fill="#5f5f5f" font-size="12">256×256 · 4스레드</text>
+    <text x="635" y="83" text-anchor="middle">키포인트 17개</text>
+
+    <text x="130" y="230" text-anchor="middle">관절 각도 · 횟수 세기</text>
+    <text x="130" y="250" text-anchor="middle" fill="#5f5f5f" font-size="12">히스테리시스 + 유지 시간</text>
+    <text x="365" y="230" text-anchor="middle">PTZ 제어</text>
+    <text x="365" y="250" text-anchor="middle" fill="#5f5f5f" font-size="12">ST3215 서보 2개 · pyserial 1 Mbaud</text>
+    <text x="595" y="230" text-anchor="middle">HTTP 서버</text>
+    <text x="595" y="250" text-anchor="middle" fill="#5f5f5f" font-size="12">MJPEG · /api · 웹앱</text>
+
+    <g stroke="#161616" fill="none" stroke-width="1.3">
+      <line x1="170" y1="78" x2="198" y2="78" marker-end="url(#ah)"/>
+      <line x1="350" y1="78" x2="378" y2="78" marker-end="url(#ah)"/>
+      <line x1="550" y1="78" x2="578" y2="78" marker-end="url(#ah)"/>
+      <polyline points="635,106 635,150 130,150"/>
+      <line x1="130" y1="150" x2="130" y2="198" marker-end="url(#ah)"/>
+      <line x1="365" y1="150" x2="365" y2="198" marker-end="url(#ah)"/>
+      <line x1="595" y1="150" x2="595" y2="198" marker-end="url(#ah)"/>
+    </g>
+  </g>
+</svg>
+<figcaption>서보는 MCU를 거치지 않고 리눅스가 버스 서보 어댑터로 직접 제어합니다. 운동 종목은 자동 분류하지 않고 웹앱에서 고릅니다.</figcaption>
+</figure>
+
+<h2>측정</h2>
+
+<table>
+  <thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead>
+  <tbody>
+    <tr><td>포즈 추론</td><td class="num">약 11.4 FPS</td><td>시청자 없을 때. 추론이 병목</td></tr>
+    <tr><td>루프 지연</td><td class="num">약 90 ms</td><td>프레임 수집부터 인코딩까지 직렬</td></tr>
+    <tr><td>시청자 1명 / 2명</td><td class="num">약 10 / 8 FPS</td><td>전송 스레드가 늘며 경합</td></tr>
+    <tr><td>CPU 사용률</td><td class="num">약 83%</td><td>4코어 모두 최대 클럭</td></tr>
+    <tr><td>온도</td><td class="num">51~73 °C</td><td>스로틀링 전 범위</td></tr>
+  </tbody>
+</table>
+<p class="caption">2026-09-08 재측정에서도 e2e 11.3 FPS(10.5~11.6)로 비슷했습니다. 측정 횟수를 따로 기록하지 않아 "약"을 붙였습니다.</p>
+
+<h2>문제와 해결</h2>
+
+<div class="case">
+  <h3>시청자가 늘면 FPS가 떨어졌다</h3>
+  <p>휴대폰과 PC가 동시에 보면 약 8 FPS까지 내려갔습니다. 파이썬 스레드가 GIL을 두고 경합하는 것과 원격 접속(Tailscale) 암호화 부담이 겹친 것으로 분석했습니다. 이 CPU는 INT8 내적 명령(asimddp)이 없어서, FPS를 크게 올릴 방법은 NPU·DSP 위임뿐이라는 것도 정리해 두었습니다.</p>
+</div>
+
+<div class="case">
+  <h3>보정 중 짐벌이 급회전해 하우징이 부서졌다</h3>
+  <p>서보 영점 오프셋의 부호 비트를 bit11이 아니라 bit15에 넣었고, 토크가 켜진 상태에서 오프셋을 바꾼 것이 겹쳤습니다. LeRobot의 Feetech 레지스터 표와 대조해 원인을 찾았습니다. 부호 비트를 인자로 받게 고치고, 토크가 켜져 있으면 보정 함수가 예외로 멈추도록 했습니다. +100 같은 작은 값으로 먼저 확인하고 늘려 간 덕분에 원인을 빨리 좁힐 수 있었습니다.</p>
+</div>
+
+<div class="case">
+  <h3>푸시업은 2D 포즈로 판정할 수 없었다</h3>
+  <p>푸시업은 팔이 카메라 깊이 방향으로 굽어서 2D 포즈로는 팔꿈치 각도가 뭉개집니다. 정면과 사선에서 판정이 애매하다는 것을 확인하고, 숄더프레스와 레터럴 레이즈로 종목을 바꿨습니다.</p>
+</div>
+
+<h2>한계</h2>
+<ul class="plain">
+  <li>횟수 판정 임계각은 현장 조정이 더 필요합니다.</li>
+  <li>CPU 여유가 약 17%뿐이라 기능을 더 얹기 어렵습니다.</li>
+</ul>
+
+<h2>사용 기술</h2>
+<p>Arduino UNO Q (QRB2210), MoveNet Thunder INT8, LiteRT, OpenCV, ST3215 버스 서보, Docker, Tailscale. 포즈 모델은 <a href="https://github.com/donghee-ai/unoq-edge-ai-lines">UNO Q Edge AI Lines</a>에서 실측해 고른 것입니다.</p>
+
+<footer><a href="../index.html">김동희 포트폴리오</a> · <a href="https://github.com/donghee-ai/health_care_bot">코드</a></footer>
+
+</main>
+</body>
+</html>

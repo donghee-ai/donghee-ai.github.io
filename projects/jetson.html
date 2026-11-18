@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jetson 온디바이스 LLM 개인 비서 · 김동희</title>
+<meta name="description" content="Jetson Orin NX에서 모델을 실측해 고르고, 활동 기록을 근거로 답하는 로컬 에이전트를 운영한 프로젝트">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+
+<a class="back" href="../index.html">김동희 포트폴리오</a>
+
+<h1>Jetson 온디바이스 LLM 개인 비서</h1>
+<p class="meta">2026.08 ~ 2026.09 · 개인 · <a href="https://github.com/donghee-ai/project-jetson">GitHub</a></p>
+
+<p>Jetson Orin NX 16GB에서 모델 구성 13개를 직접 측정하고, 그 결과로 고른 Qwen3-8B 위에 개인 비서를 만들었습니다. PC와 휴대폰 활동을 10분 단위로 모으고, 질문을 받으면 도구로 실제 기록을 찾아본 뒤 그 기록을 근거로 Slack에서 답합니다.</p>
+
+<figure>
+  <video src="../assets/jetson-agent-4x.mp4" poster="../assets/jetson-poster.jpg" controls autoplay muted loop playsinline preload="metadata" aria-label="로컬 에이전트가 Slack에서 답하는 장면, 4배속"></video>
+  <figcaption>Jetson에서 도는 Qwen3-8B가 도구로 활동·계획 기록을 조회한 뒤 Slack에서 답하는 장면입니다. 4배속.</figcaption>
+</figure>
+
+<h2>구조</h2>
+
+<figure>
+<svg viewBox="0 0 720 360" role="img" aria-label="Life Trainer 구조">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#161616"/>
+    </marker>
+  </defs>
+  <g font-size="13" fill="#161616">
+    <rect x="186" y="24" width="372" height="326" fill="none" stroke="#9a9a9a" stroke-dasharray="5 4" rx="6"/>
+    <text x="198" y="16" fill="#5f5f5f">Jetson Orin NX 16GB</text>
+
+    <g stroke="#161616" fill="#fff">
+      <rect x="10" y="40" width="150" height="46" rx="4"/>
+      <rect x="10" y="100" width="150" height="46" rx="4"/>
+      <rect x="10" y="160" width="150" height="40" rx="4"/>
+      <rect x="10" y="270" width="150" height="40" rx="4"/>
+
+      <rect x="205" y="40" width="150" height="46" rx="4"/>
+      <rect x="205" y="120" width="150" height="50" rx="4"/>
+      <rect x="205" y="210" width="150" height="50" rx="4"/>
+
+      <rect x="390" y="40" width="150" height="46" rx="4"/>
+      <rect x="390" y="190" width="150" height="50" rx="4"/>
+      <rect x="390" y="280" width="150" height="50" rx="4"/>
+
+      <rect x="590" y="40" width="120" height="46" rx="4"/>
+      <rect x="590" y="200" width="120" height="70" rx="4"/>
+    </g>
+
+    <text x="85" y="60" text-anchor="middle">Windows 활동</text>
+    <text x="85" y="77" text-anchor="middle" fill="#5f5f5f" font-size="12">ActivityWatch</text>
+    <text x="85" y="120" text-anchor="middle">Android 활동</text>
+    <text x="85" y="137" text-anchor="middle" fill="#5f5f5f" font-size="12">LT Phone</text>
+    <text x="85" y="185" text-anchor="middle">RSS · arXiv</text>
+    <text x="85" y="295" text-anchor="middle">계획 · 수동 수정</text>
+
+    <text x="280" y="68" text-anchor="middle">수집 · 동기화</text>
+    <text x="280" y="142" text-anchor="middle">10분 단위 롤업</text>
+    <text x="280" y="160" text-anchor="middle" fill="#5f5f5f" font-size="12">기기 간 겹침 정리</text>
+    <text x="280" y="232" text-anchor="middle">SQLite</text>
+    <text x="280" y="250" text-anchor="middle" fill="#5f5f5f" font-size="12">WAL · FTS5</text>
+
+    <text x="465" y="68" text-anchor="middle">SQL 집계</text>
+    <text x="465" y="212" text-anchor="middle">Qwen3-8B</text>
+    <text x="465" y="230" text-anchor="middle" fill="#5f5f5f" font-size="12">llama.cpp · GPU 큐 1개</text>
+    <text x="465" y="302" text-anchor="middle">로컬 에이전트</text>
+    <text x="465" y="320" text-anchor="middle" fill="#5f5f5f" font-size="12">MCP 도구로 기록 조회</text>
+
+    <text x="650" y="68" text-anchor="middle">웹 플래너</text>
+    <text x="650" y="230" text-anchor="middle">Slack</text>
+    <text x="650" y="250" text-anchor="middle" fill="#5f5f5f" font-size="12">리포트 · 대화</text>
+
+    <g stroke="#161616" fill="none" stroke-width="1.3">
+      <line x1="160" y1="63" x2="203" y2="63" marker-end="url(#ah)"/>
+      <line x1="160" y1="123" x2="203" y2="72" marker-end="url(#ah)"/>
+      <line x1="160" y1="180" x2="203" y2="80" marker-end="url(#ah)"/>
+      <line x1="160" y1="290" x2="203" y2="245" marker-end="url(#ah)"/>
+      <line x1="280" y1="86" x2="280" y2="118" marker-end="url(#ah)"/>
+      <line x1="280" y1="170" x2="280" y2="208" marker-end="url(#ah)"/>
+      <line x1="355" y1="222" x2="388" y2="78" marker-end="url(#ah)"/>
+      <line x1="355" y1="235" x2="388" y2="215" marker-end="url(#ah)"/>
+      <line x1="465" y1="240" x2="465" y2="278" marker-end="url(#ah)"/>
+      <line x1="540" y1="63" x2="588" y2="63" marker-end="url(#ah)"/>
+      <line x1="540" y1="72" x2="588" y2="215" marker-end="url(#ah)"/>
+      <line x1="540" y1="300" x2="588" y2="255" marker-end="url(#ah)"/>
+    </g>
+  </g>
+</svg>
+<figcaption>집계와 리포트는 SQL이 만들고, LLM은 대화와 요약에만 씁니다. GPU를 쓰는 작업은 큐 하나로 순서대로 처리합니다.</figcaption>
+</figure>
+
+<h2>모델 선택: 스펙이 아니라 측정으로</h2>
+
+<table>
+  <thead><tr><th>측정</th><th>Qwen3-8B</th><th>Qwen3-30B-A3B</th><th>EXAONE 3.5 7.8B</th></tr></thead>
+  <tbody>
+    <tr><td>도구 호출 6케이스</td><td class="num">6/6</td><td class="num">4/6</td><td>도구 호출 미지원</td></tr>
+    <tr><td>32K 문맥 서버 메모리</td><td class="num">8,606 MB</td><td class="num">12,925 MB</td><td>–</td></tr>
+    <tr><td>약 9,600 토큰 생성 속도</td><td class="num">7.80 tok/s</td><td class="num">7.76 tok/s</td><td>–</td></tr>
+  </tbody>
+</table>
+<p class="caption">속도와 메모리는 MAXN 모드, llama.cpp로 실측했습니다. 13개 구성 중 최종 후보 3개만 도구 호출을 시험했습니다. 처음에는 30B를 기본으로 정했다가 도구 호출 결과를 보고 8B로 바꿨습니다.</p>
+
+<figure>
+  <img src="../assets/jetson-depth-crossover.png" alt="문맥 길이에 따른 생성 속도 그래프. 약 9,600 토큰에서 8B와 30B 순위가 바뀜">
+  <figcaption>문맥이 얕으면 30B가 빠르고, 약 9,600 토큰부터는 8B가 더 빠릅니다.</figcaption>
+</figure>
+
+<figure>
+  <img src="../assets/jetson-memory-budget.png" alt="LLM 스택이 쓸 수 있는 13.4GB 메모리 배분 그래프">
+  <figcaption>메모리 배분. 문맥 길이를 40,960에서 20,480으로 줄여 KV 캐시를 2.99GB에서 1.50GB로 낮춘 것이 예산을 맞춘 결정이었습니다.</figcaption>
+</figure>
+
+<h2>운영하며 고친 것</h2>
+<p>2026-08-17부터 09-08까지 장애와 판단 기록 65건을 남겼습니다. 그중 세 가지입니다.</p>
+
+<div class="case">
+  <h3>상태 점검이 이틀 동안 정상이라고 했다</h3>
+  <p>새벽 야간 배치가 모델 로딩 중의 503 응답을 영구 오류로 처리해 277건이 실패했고 성공률은 71%였습니다. 그런데 상태 점검은 이틀 동안 정상으로 표시했습니다. 503·502·504·429를 일시 장애로 다시 분류하고, 점검 기준을 실패율로 바꿨습니다.</p>
+</div>
+
+<div class="case">
+  <h3>묻지 않은 개인 발화가 외부 검색 API로 나갔다</h3>
+  <p>검색 API 대시보드에서 묻지 않은 개인 발화가 30여 회 나간 것을 직접 발견했습니다. 게이트는 원문을 검사했는데, 그 뒤에서 다시 조립한 문자열이 나간 것이 원인이었습니다. 발송 직전에 다시 검사하게 고치고 회귀 테스트 5개를 붙였습니다.</p>
+</div>
+
+<div class="case">
+  <h3>메모리 부족으로 서버가 죽었다</h3>
+  <p>전역 OOM으로 8B 서버가 종료됐고 스왑은 97.8%였습니다. 전날 한 시점의 스냅숏만 보고 "문제없다"고 판단한 것이 틀렸습니다. 매일 아침 서버를 재기동하는 타이머를 넣었습니다.</p>
+</div>
+
+<h2>한계</h2>
+<ul class="plain">
+  <li>가동률은 따로 측정하지 않았습니다.</li>
+  <li>운영 기록은 2026-09 초까지입니다.</li>
+</ul>
+
+<h2>사용 기술</h2>
+<p>Jetson Orin NX 16GB, llama.cpp, Qwen3-8B, MCP, SQLite, systemd, Slack, Tailscale. 휴대폰 수집 앱은 ActivityWatch Android를 고친 <a href="https://github.com/donghee-ai/LT-Phone">LT Phone</a>입니다.</p>
+
+<footer><a href="../index.html">김동희 포트폴리오</a> · <a href="https://github.com/donghee-ai/project-jetson">코드</a></footer>
+
+</main>
+</body>
+</html>
